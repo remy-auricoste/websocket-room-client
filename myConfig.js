@@ -1,5 +1,5 @@
 module.exports = {
-    name: "myProject",
+    name: "websocket-client",
     sourceDir: "src/main",
     testDir: "src/test/js",
     testFile: "src/test/tests.js",
