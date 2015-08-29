@@ -1,0 +1,21 @@
+{
+  "name": "angular-project-starter",
+  "version": "0.0.1",
+  "description": "",
+  "main": "src/main/js/main.js",
+  "scripts": {
+    "test": "node commands.js test",
+    "start": "node server.js"
+  },
+  "author": "remy.auricoste@gmail.com",
+  "license": "ISC",
+  "devDependencies": {
+    "node-static": "^0.7.6",
+    "q": "^1.4.1",
+    "rauricoste-node-tests": "x"
+  },
+  "dependencies": {
+    "angular": "^1.3.16",
+    "angular-route": "^1.3.16"
+  }
+}
