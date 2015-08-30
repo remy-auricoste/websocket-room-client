@@ -2,7 +2,7 @@
   "name": "rauricoste-websocket-room-client",
   "version": "0.0.2",
   "description": "",
-  "main": "src/main/js/main.js",
+  "main": "src/main/js/SocketBus.js",
   "scripts": {
     "test": "node commands.js test",
     "start": "node server.js"
