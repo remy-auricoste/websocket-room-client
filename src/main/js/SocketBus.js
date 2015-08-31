@@ -1,9 +1,11 @@
 /* import Socket */ var Socket = require("./Socket");
 var Q = require("q");
 
-var SocketBus = function(url, onReceive) {
+var SocketBus = function(url, onReceive, onRoomChange) {
     this.onReceive = onReceive;
+    this.onRoomChange = onRoomChange;
     var self = this;
+    this.rooms = {};
 
     var defer = Q.defer();
     this.socket = new Socket(function(messageStr) {
@@ -20,6 +22,18 @@ var SocketBus = function(url, onReceive) {
                     break;
                 case "JOIN":
                     console.log("joined room "+message.room, message.members);
+                    self.rooms[message.room] = message.members;
+                    self.callRoomUpdate(message.room);
+                    break;
+                case "ROOM_JOIN":
+                    var room = self.rooms[message.room];
+                    room.push(message.id);
+                    self.callRoomUpdate(message.room);
+                    break;
+                case "ROOM_LEAVE":
+                    var room = self.rooms[message.room];
+                    room.splice(room.indexOf(message.id), 1);
+                    self.callRoomUpdate(message.room);
                     break;
                 default:
                     console.warn("unknown command", message.server);
@@ -62,5 +76,14 @@ SocketBus.prototype.sendRoom = function(roomName, message) {
         room: roomName,
         message: message
     });
+}
+SocketBus.prototype.callRoomUpdate = function(roomName) {
+    var self = this;
+    if (this.onRoomChange && typeof this.onRoomChange === "function") {
+        this.onRoomChange({
+            room: roomName,
+            members: self.rooms[roomName]
+        });
+    }
 }
 module.exports = SocketBus;
