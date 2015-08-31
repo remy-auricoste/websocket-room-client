@@ -1,9 +1,13 @@
 var SocketBus = require("./SocketBus");
 
-var socketBus = new SocketBus("ws://localhost:8001/", function(message) {
-    console.log("receive", message);
-}, function(roomChange) {
-    console.log("room change", JSON.stringify(roomChange));
+var socketBus = new SocketBus({
+    url: "ws://localhost:8001/",
+    onReceive: function(message) {
+        console.log("receive", message);
+    },
+    onRoomChange: function(roomChange) {
+        console.log("room change", JSON.stringify(roomChange));
+    }
 });
 
 socketBus.joinRoom("testRoom");

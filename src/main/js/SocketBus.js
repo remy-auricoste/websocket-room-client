@@ -2,6 +2,13 @@
 var Q = require("q");
 
 var SocketBus = function(url, onReceive, onRoomChange) {
+    // object compatibility
+    if (typeof url === "object" && !onReceive && !onRoomChange) {
+        onReceive = url.onReceive;
+        onRoomChange = url.onRoomChange;
+        url = url.url; // should be last !!!
+    }
+
     this.onReceive = onReceive;
     this.onRoomChange = onRoomChange;
     var self = this;
