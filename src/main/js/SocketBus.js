@@ -78,6 +78,9 @@ SocketBus.prototype.sendCommand = function(command, args) {
 SocketBus.prototype.joinRoom = function(roomName) {
     this.sendCommand("JOIN", [roomName]);
 }
+SocketBus.prototype.leaveRoom = function(roomName) {
+    this.sendCommand("LEAVE", [roomName]);
+}
 SocketBus.prototype.sendRoom = function(roomName, message) {
     this.sendObject({
         room: roomName,
