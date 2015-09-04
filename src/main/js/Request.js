@@ -59,7 +59,7 @@ module.exports = {
                 res.body += data;
             });
             res.on("end", function() {
-                if (res.statusCode >= 400) {
+                if (res.statusCode >= 400 || res.statusCode === 0) {
                     defer.reject({
                         options: options,
                         res: {

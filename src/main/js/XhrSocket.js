@@ -13,7 +13,7 @@ Socket.prototype.connect = function(url) {
         method: "GET",
         withCredentials: false
     }).then(function(result) {
-        console.log("connected", result.body);
+        console.log("connected", result);
         var message = JSON.parse(result.body);
         if (message.id) {
             self.connected = true;
