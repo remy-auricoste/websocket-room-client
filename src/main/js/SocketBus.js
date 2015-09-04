@@ -1,4 +1,5 @@
 /* import Socket */ var Socket = require("./Socket");
+/* import XhrSocket */ var XhrSocket = require("./XhrSocket");
 var Q = require("q");
 
 var SocketBus = function(url, onReceive, onRoomChange) {
@@ -15,7 +16,7 @@ var SocketBus = function(url, onReceive, onRoomChange) {
     this.rooms = {};
 
     var defer = Q.defer();
-    this.socket = new Socket(function(messageStr) {
+    this.socket = new XhrSocket(function(messageStr) {
         var message = JSON.parse(messageStr);
         if (message.server) {
             switch(message.server) {
