@@ -1,7 +1,7 @@
 var SocketBus = require("./SocketBus");
 
 var socketBus = new SocketBus({
-    host: "localhost:8001",
+    host: ["websocket-room-http.herokuapp.com", "websocket-room-ws.herokuapp.com"],
     onReceive: function(message) {
         console.log("receive", message);
     },

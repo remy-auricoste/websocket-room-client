@@ -73,8 +73,6 @@ module.exports = {
             });
         }
         var errorHandler = function(e) {
-           console.error("error while calling : "+method+" "+completeUrl);
-           console.error(e);
            defer.reject(e);
         };
         try {

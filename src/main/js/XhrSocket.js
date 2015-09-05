@@ -25,7 +25,7 @@ Socket.prototype.connect = function(url) {
             throw new Error(message.error);
         }
     }).catch(function(err) {
-        console.error("error", err);
+        throw err;
     });
 }
 Socket.prototype.close = function() {

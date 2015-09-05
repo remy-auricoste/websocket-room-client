@@ -1,6 +1,6 @@
 /* import Socket */ var Socket = require("./Socket");
 /* import XhrSocket */ var XhrSocket = require("./XhrSocket");
-var Q = require("q");
+var Q = require("./Q");
 
 var SocketBus = function(host, onReceive, onRoomChange) {
     // object compatibility
@@ -11,6 +11,9 @@ var SocketBus = function(host, onReceive, onRoomChange) {
     }
     if (!host || !host.length) {
         throw new Error("error in init : host="+host);
+    }
+    if (typeof host === "string") {
+        host = [host];
     }
     this.host = host;
     this.onReceive = onReceive;
@@ -53,12 +56,26 @@ var SocketBus = function(host, onReceive, onRoomChange) {
         }
         self.onReceive(message);
     };
-    this.socket = new Socket(receiveFct);
-    this.socket.connect("wss://"+self.host).catch(function(err) {
-        console.error(err);
-        self.socket = new XhrSocket(receiveFct);
-        return self.socket.connect("http://"+self.host+"/socket");
-    })
+    Q.traverse(self.host, function(host) {
+        self.socket = new Socket(receiveFct);
+        return self.socket.connect("ws://"+host).catch(function(err) {
+            self.socket = new XhrSocket(receiveFct);
+            return self.socket.connect("http://"+host+"/socket");
+        }).then(function() {
+            throw "connected";
+        }).catch(function(err) {
+            if (err !== "connected") {
+                // silence exceptions
+                console.error(err);
+            } else {
+                throw err;
+            }
+        });
+    }).catch(function(err) {
+        if (err !== "connected") {
+            throw err;
+        }
+    });
     this.connectPromise = defer.promise;
 }
 SocketBus.prototype.sendObject = function(object) {
