@@ -28,7 +28,7 @@ var SocketBus = function(host, onReceive, onRoomChange) {
             switch(message.server) {
                 case "ID":
                     self.id = message.id;
-                    console.log("SocketBus connected to "+self.host+" with id "+self.id);
+                    console.log("SocketBus connected to "+self.usedHost+" with id "+self.id);
                     defer.resolve();
                     break;
                 case "ERROR":
@@ -58,6 +58,7 @@ var SocketBus = function(host, onReceive, onRoomChange) {
     };
     Q.traverse(self.host, function(host) {
         self.socket = new Socket(receiveFct);
+        self.usedHost = host;
         return self.socket.connect("ws://"+host).catch(function(err) {
             self.socket = new XhrSocket(receiveFct);
             return self.socket.connect("http://"+host+"/socket");
