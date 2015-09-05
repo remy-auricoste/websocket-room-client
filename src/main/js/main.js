@@ -1,7 +1,7 @@
 var SocketBus = require("./SocketBus");
 
 var socketBus = new SocketBus({
-    url: "http://localhost:8002/socket",
+    host: "localhost:8001",
     onReceive: function(message) {
         console.log("receive", message);
     },

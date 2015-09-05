@@ -2,27 +2,30 @@
 /* import XhrSocket */ var XhrSocket = require("./XhrSocket");
 var Q = require("q");
 
-var SocketBus = function(url, onReceive, onRoomChange) {
+var SocketBus = function(host, onReceive, onRoomChange) {
     // object compatibility
-    if (typeof url === "object" && !onReceive && !onRoomChange) {
-        onReceive = url.onReceive;
-        onRoomChange = url.onRoomChange;
-        url = url.url; // should be last !!!
+    if (typeof host === "object" && !onReceive && !onRoomChange) {
+        onReceive = host.onReceive;
+        onRoomChange = host.onRoomChange;
+        host = host.host; // should be last !!!
     }
-
+    if (!host || !host.length) {
+        throw new Error("error in init : host="+host);
+    }
+    this.host = host;
     this.onReceive = onReceive;
     this.onRoomChange = onRoomChange;
     var self = this;
     this.rooms = {};
 
     var defer = Q.defer();
-    this.socket = new XhrSocket(function(messageStr) {
+    var receiveFct = function(messageStr) {
         var message = JSON.parse(messageStr);
         if (message.server) {
             switch(message.server) {
                 case "ID":
                     self.id = message.id;
-                    console.log("SocketBus connected to "+url+" with id "+self.id);
+                    console.log("SocketBus connected to "+self.host+" with id "+self.id);
                     defer.resolve();
                     break;
                 case "ERROR":
@@ -48,18 +51,15 @@ var SocketBus = function(url, onReceive, onRoomChange) {
             }
             return;
         }
-//        if (message.dest !== self.id) {
-//            console.error("received a message with dest "+message.dest+". my id is "+self.id);
-//            return;
-//        }
         self.onReceive(message);
-    });
-    this.socket.connect(url);
+    };
+    this.socket = new Socket(receiveFct);
+    this.socket.connect("wss://"+self.host).catch(function(err) {
+        console.error(err);
+        self.socket = new XhrSocket(receiveFct);
+        return self.socket.connect("http://"+self.host+"/socket");
+    })
     this.connectPromise = defer.promise;
-
-    window.onclose = function() {
-        self.close();
-    }
 }
 SocketBus.prototype.sendObject = function(object) {
     var self = this;

@@ -16,7 +16,9 @@ Socket.prototype.connect = function(url) {
         self.connected = false;
     }
     self.wrapped.onerror = function(err) {
-        console.error(err);
+        if (!self.connected) {
+            defer.reject(err);
+        }
         throw err;
     }
     self.wrapped.onmessage = function(event) {
