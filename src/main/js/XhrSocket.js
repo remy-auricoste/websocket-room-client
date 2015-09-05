@@ -30,12 +30,39 @@ Socket.prototype.connect = function(url) {
 }
 Socket.prototype.close = function() {
     self.connnected = false;
+    return Request.call({
+        url: self.url+"/"+self.id,
+        method: "DELETE",
+        withCredentials: false
+    }).then(function(result) {
+        var body = result.body;
+        var response = JSON.parse(body);
+        if (response.error) {
+            throw new Error(response.error);
+        }
+    }).catch(function(err) {
+        console.error("error", err);
+    });
 }
 Socket.prototype.send = function(message) {
     if (!this.connected) {
         throw new Error("not connected !");
     }
-    //this.wrapped.send(message);
+    var self = this;
+    return Request.call({
+        url: self.url+"/"+self.id,
+        method: "POST",
+        withCredentials: false,
+        postParams: message
+    }).then(function(result) {
+        var body = result.body;
+        var response = JSON.parse(body);
+        if (response.error) {
+            throw new Error(response.error);
+        }
+    }).catch(function(err) {
+        console.error("error", err);
+    });
 }
 Socket.prototype.poll = function() {
     var self = this;

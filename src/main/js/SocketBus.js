@@ -56,6 +56,10 @@ var SocketBus = function(url, onReceive, onRoomChange) {
     });
     this.socket.connect(url);
     this.connectPromise = defer.promise;
+
+    window.onclose = function() {
+        self.close();
+    }
 }
 SocketBus.prototype.sendObject = function(object) {
     var self = this;
@@ -96,5 +100,8 @@ SocketBus.prototype.callRoomUpdate = function(roomName) {
             members: self.rooms[roomName]
         });
     }
+}
+SocketBus.prototype.close = function() {
+    this.socket.close();
 }
 module.exports = SocketBus;
