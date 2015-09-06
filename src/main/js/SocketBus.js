@@ -87,25 +87,25 @@ SocketBus.prototype.sendObject = function(object) {
     });
 }
 SocketBus.prototype.send = function(dest, message) {
-    this.sendObject({
+    return this.sendObject({
         dest: dest,
         message: message
     });
 }
 SocketBus.prototype.sendCommand = function(command, args) {
-    this.sendObject({
+    return this.sendObject({
         server: command,
         args: args
     });
 }
 SocketBus.prototype.joinRoom = function(roomName) {
-    this.sendCommand("JOIN", [roomName]);
+    return this.sendCommand("JOIN", [roomName]);
 }
 SocketBus.prototype.leaveRoom = function(roomName) {
-    this.sendCommand("LEAVE", [roomName]);
+    return this.sendCommand("LEAVE", [roomName]);
 }
 SocketBus.prototype.sendRoom = function(roomName, message) {
-    this.sendObject({
+    return this.sendObject({
         room: roomName,
         message: message
     });

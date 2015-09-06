@@ -34,6 +34,6 @@ Socket.prototype.send = function(message) {
     if (!this.connected) {
         throw new Error("not connected !");
     }
-    this.wrapped.send(message);
+    return this.wrapped.send(message);
 }
 module.exports = Socket;
