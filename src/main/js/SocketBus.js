@@ -29,6 +29,7 @@ var SocketBus = function(host, onReceive, onRoomChange) {
     this.onRoomChange = onRoomChange;
     var self = this;
     this.rooms = {};
+    this.listeners = [];
 
     var defer = Q.defer();
     var receiveFct = function(messageStr) {
@@ -64,6 +65,9 @@ var SocketBus = function(host, onReceive, onRoomChange) {
             return;
         }
         self.onReceive(message);
+        self.listeners.forEach(function(listener) {
+            listener(message);
+        });
     };
     Q.traverse(self.host, function(host) {
         self.socket = new Socket(receiveFct);
@@ -136,5 +140,8 @@ SocketBus.prototype.callRoomUpdate = function(roomName) {
 }
 SocketBus.prototype.close = function() {
     this.socket.close();
+}
+SocketBus.prototype.addListener = function(listener) {
+    this.listeners.push(listener);
 }
 module.exports = SocketBus;
