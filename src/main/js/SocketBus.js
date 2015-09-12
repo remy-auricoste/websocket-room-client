@@ -25,11 +25,11 @@ var SocketBus = function(host, onReceive, onRoomChange) {
         host = [host];
     }
     this.host = host;
-    this.onReceive = onReceive;
     this.onRoomChange = onRoomChange;
     var self = this;
     this.rooms = {};
     this.listeners = [];
+    this.addListener(onReceive);
 
     var defer = Q.defer();
     var receiveFct = function(messageStr) {
@@ -64,7 +64,6 @@ var SocketBus = function(host, onReceive, onRoomChange) {
             }
             return;
         }
-        self.onReceive(message);
         self.listeners.forEach(function(listener) {
             listener(message);
         });
@@ -142,6 +141,10 @@ SocketBus.prototype.close = function() {
     this.socket.close();
 }
 SocketBus.prototype.addListener = function(listener) {
-    this.listeners.push(listener);
+    if (typeof listener === "function") {
+        this.listeners.push(listener);
+    } else if (listener) {
+        throw new Error("listener should be a function. received: "+typeof listener);
+    }
 }
 module.exports = SocketBus;
