@@ -1,6 +1,6 @@
 {
   "name": "rauricoste-websocket-room-client",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "description": "",
   "main": "src/main/js/SocketBus.js",
   "scripts": {
