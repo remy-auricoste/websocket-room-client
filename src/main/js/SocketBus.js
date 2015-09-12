@@ -2,6 +2,15 @@
 /* import XhrSocket */ var XhrSocket = require("./XhrSocket");
 var Q = require("./Q");
 
+var cron = function(interval, fonction) {
+    setTimeout(function() {
+        var result = fonction();
+        if (result) {
+            cron(interval, fonction);
+        }
+    }, interval);
+}
+
 var SocketBus = function(host, onReceive, onRoomChange) {
     // object compatibility
     if (typeof host === "object" && !onReceive && !onRoomChange) {
@@ -78,6 +87,12 @@ var SocketBus = function(host, onReceive, onRoomChange) {
         }
     });
     this.connectPromise = defer.promise;
+    this.connectPromise.then(function() {
+        cron(40000, function() {
+            self.sendCommand("PING");
+            return self.connected;
+        });
+    });
 }
 SocketBus.prototype.sendObject = function(object) {
     var self = this;
