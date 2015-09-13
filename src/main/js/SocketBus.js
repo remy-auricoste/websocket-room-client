@@ -1,6 +1,7 @@
 /* import Socket */ var Socket = require("./Socket");
 /* import XhrSocket */ var XhrSocket = require("./XhrSocket");
 var Q = require("./Q");
+var Random = require("rauricoste-random");
 
 var cron = function(interval, fonction) {
     setTimeout(function() {
@@ -28,7 +29,7 @@ var SocketBus = function(host, onReceive, onRoomChange) {
     this.onRoomChange = onRoomChange;
     var self = this;
     this.rooms = {};
-    this.listeners = [];
+    this.listeners = {};
     this.addListener(onReceive);
 
     var defer = Q.defer();
@@ -64,9 +65,10 @@ var SocketBus = function(host, onReceive, onRoomChange) {
             }
             return;
         }
-        self.listeners.forEach(function(listener) {
+        for (var key in self.listeners) {
+            var listener = self.listeners[key];
             listener(message);
-        });
+        }
     };
     Q.traverse(self.host, function(host) {
         self.socket = new Socket(receiveFct);
@@ -140,9 +142,23 @@ SocketBus.prototype.callRoomUpdate = function(roomName) {
 SocketBus.prototype.close = function() {
     this.socket.close();
 }
+
+var findListenerId = function(listeners) {
+    var id = Random.nextReadableId();
+    var existingObj = listeners[id];
+    return existingObj ? findListenerId(listeners) : id;
+}
+
 SocketBus.prototype.addListener = function(listener) {
+    var self = this;
     if (typeof listener === "function") {
-        this.listeners.push(listener);
+        var id = findListenerId(self.listeners);
+        this.listeners[id] = listener;
+        return {
+            delete: function() {
+                delete self.listeners[id];
+            }
+        }
     } else if (listener) {
         throw new Error("listener should be a function. received: "+typeof listener);
     }
