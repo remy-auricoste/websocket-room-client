@@ -163,4 +163,37 @@ SocketBus.prototype.addListener = function(listener) {
         throw new Error("listener should be a function. received: "+typeof listener);
     }
 }
+SocketBus.prototype.subSocket = function(key, onReceive) {
+    var self = this;
+    var listener = this.addListener(function(messageObj) {
+        if (messageObj.message[key]) {
+            onReceive({
+                source: messageObj.source,
+                dest: messageObj.dest,
+                room: messageObj.room,
+                message: messageObj.message[key]
+            });
+        }
+    });
+    return {
+        listener: listener,
+        finalMessage: function(message) {
+            var result = {};
+            result[key] = message;
+            return result;
+        },
+        send: function(dest, message) {
+            return self.send(dest, this.finalMessage(message));
+        },
+        sendRoom: function(roomName, message) {
+            return self.sendRoom(roomName, this.finalMessage(message));
+        },
+        joinRoom: function(roomName) {
+          return self.joinRoom(roomName);
+        },
+        leaveRoom: function(roomName) {
+          return self.leaveRoom(roomName);
+        }
+    }
+}
 module.exports = SocketBus;
