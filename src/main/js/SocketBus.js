@@ -1,5 +1,5 @@
-/* import Socket */ var Socket = require("./Socket");
-/* import XhrSocket */ var XhrSocket = require("./XhrSocket");
+/* import Socket */ var Socket = require('./Socket');
+/* import XhrSocket */ var XhrSocket = require('./XhrSocket');
 var Q = require("./Q");
 var Random = require("rauricoste-random");
 
@@ -12,11 +12,10 @@ var cron = function(interval, fonction) {
     }, interval);
 }
 
-var SocketBus = function(host, onReceive, onRoomChange) {
+var SocketBus = function(host, onReceive) {
     // object compatibility
-    if (typeof host === "object" && !onReceive && !onRoomChange) {
+    if (typeof host === "object" && !onReceive) {
         onReceive = host.onReceive;
-        onRoomChange = host.onRoomChange;
         host = host.host; // should be last !!!
     }
     if (!host || !host.length) {
@@ -26,10 +25,10 @@ var SocketBus = function(host, onReceive, onRoomChange) {
         host = [host];
     }
     this.host = host;
-    this.onRoomChange = onRoomChange;
     var self = this;
     this.rooms = {};
     this.listeners = {};
+    this.roomListeners = {};
     this.addListener(onReceive);
 
     var defer = Q.defer();
@@ -132,11 +131,13 @@ SocketBus.prototype.sendRoom = function(roomName, message) {
 }
 SocketBus.prototype.callRoomUpdate = function(roomName) {
     var self = this;
-    if (this.onRoomChange && typeof this.onRoomChange === "function") {
-        this.onRoomChange({
-            room: roomName,
-            members: self.rooms[roomName]
-        });
+    var message = {
+      room: roomName,
+      members: self.rooms[roomName]
+    };
+    for (var key in self.roomListeners) {
+        var listener = self.roomListeners[key];
+        listener(message);
     }
 }
 SocketBus.prototype.close = function() {
@@ -157,6 +158,20 @@ SocketBus.prototype.addListener = function(listener) {
         return {
             delete: function() {
                 delete self.listeners[id];
+            }
+        }
+    } else if (listener) {
+        throw new Error("listener should be a function. received: "+typeof listener);
+    }
+}
+SocketBus.prototype.addRoomListener = function(listener) {
+    var self = this;
+    if (typeof listener === "function") {
+        var id = findListenerId(self.roomListeners);
+        this.roomListeners[id] = listener;
+        return {
+            delete: function() {
+                delete self.roomListeners[id];
             }
         }
     } else if (listener) {
@@ -195,5 +210,59 @@ SocketBus.prototype.subSocket = function(key, onReceive) {
           return self.leaveRoom(roomName);
         }
     }
+}
+SocketBus.prototype.openRoom = function(roomName) {
+    var self = this;
+    self.joinRoom(roomName);
+    var result = {
+        listeners: [],
+        nicknames: {},
+        send: function(message) {
+            return self.sendRoom(roomName, message);
+        },
+        sendNickName: function(nickname) {
+            this.send({__nickname: nickname});
+        },
+        getRoomUsers: function() {
+            var self2 = this;
+            if (!self.rooms[roomName]) {
+              return [];
+            }
+            return self.rooms[roomName].map(function(userId) {
+                var nickname = self2.nicknames[userId];
+                return nickname ? nickname : userId;
+            });
+        },
+        addListener: function(fonction) {
+            var listener = self.addListener(function(messageObj) {
+                if (messageObj.room && messageObj.room === roomName) {
+                    fonction(messageObj);
+                }
+            });
+            this.listeners.push(listener);
+            return listener;
+        },
+        addRoomListener: function(fonction) {
+            var listener = self.addRoomListener(function(messageObj) {
+                if (messageObj.room === roomName) {
+                    fonction(messageObj);
+                }
+            });
+            this.listeners.push(listener);
+            return listener;
+        },
+        close: function() {
+            self.leaveRoom(roomName);
+            this.listeners.map(function(listener) {
+                listener.delete();
+            });
+        }
+    }
+    result.addListener(function(messageObj) {
+        if (messageObj.message.__nickname) {
+            result.nicknames[messageObj.source] = messageObj.message.__nickname;
+        }
+    });
+    return result;
 }
 module.exports = SocketBus;
