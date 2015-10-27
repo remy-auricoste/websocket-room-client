@@ -94,7 +94,7 @@ module.exports = {
             }
             var splittedHost = parsedUrl.host.split(":");
             var host = splittedHost[0];
-            var port = splittedHost.length === 2 ? splittedHost[1] : 80;
+            var port = splittedHost.length === 2 ? splittedHost[1] : (parsedUrl.protocol === "https:" ? 443 : 80);
             var post_options = {
                 host: host,
                 port: port,

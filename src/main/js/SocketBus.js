@@ -70,12 +70,10 @@ var SocketBus = function(host, onReceive) {
         }
     };
     Q.traverse(self.host, function(host) {
-        self.socket = new Socket(receiveFct);
+        var socketFactory = host.substring(0, 2) === "ws" ? Socket : XhrSocket;
+        self.socket = new socketFactory(receiveFct);
         self.usedHost = host;
-        return self.socket.connect("ws://"+host).catch(function(err) {
-            self.socket = new XhrSocket(receiveFct);
-            return self.socket.connect("http://"+host+"/socket");
-        }).then(function() {
+        return self.socket.connect(host).then(function() {
             throw "connected";
         }).catch(function(err) {
             if (err !== "connected") {
