@@ -186,4 +186,7 @@ SocketBus.prototype.openRoom = function(roomName) {
     self.joinRoom(roomName);
     return new RoomSocket(roomName, this);
 }
+SocketBus.prototype.getId = function() {
+    return this.id;
+}
 module.exports = SocketBus;
