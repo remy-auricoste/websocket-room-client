@@ -36,7 +36,7 @@ RoomSocket.prototype.getRoomUsers = function() {
 }
 RoomSocket.prototype.addListener = function(fonction) {
     var self = this;
-    var listener = this.rootSocket.addRoomListener(function(messageObj) {
+    var listener = this.rootSocket.addListener(function(messageObj) {
         if (messageObj.room && messageObj.room === self.name) {
             fonction(messageObj);
         }
