@@ -1,4 +1,6 @@
 /* import Socket */ var Socket = require('./Socket');
+/* import SubSocket */ var SubSocket = require('./SubSocket');
+/* import RoomSocket */ var RoomSocket = require('./RoomSocket');
 /* import XhrSocket */ var XhrSocket = require('./XhrSocket');
 var Q = require("./Q");
 var Random = require("rauricoste-random");
@@ -176,92 +178,12 @@ SocketBus.prototype.addRoomListener = function(listener) {
         throw new Error("listener should be a function. received: "+typeof listener);
     }
 }
-SocketBus.prototype.subSocket = function(key, onReceive) {
-    var self = this;
-    var listener = this.addListener(function(messageObj) {
-        if (messageObj.message[key]) {
-            onReceive({
-                source: messageObj.source,
-                dest: messageObj.dest,
-                room: messageObj.room,
-                message: messageObj.message[key]
-            });
-        }
-    });
-    return {
-        listener: listener,
-        finalMessage: function(message) {
-            var result = {};
-            result[key] = message;
-            return result;
-        },
-        send: function(dest, message) {
-            return self.send(dest, this.finalMessage(message));
-        },
-        sendRoom: function(roomName, message) {
-            return self.sendRoom(roomName, this.finalMessage(message));
-        },
-        joinRoom: function(roomName) {
-          return self.joinRoom(roomName);
-        },
-        leaveRoom: function(roomName) {
-          return self.leaveRoom(roomName);
-        }
-    }
+SocketBus.prototype.subSocket = function(key) {
+    return new SubSocket(this, key);
 }
 SocketBus.prototype.openRoom = function(roomName) {
     var self = this;
     self.joinRoom(roomName);
-    var result = {
-        getId: function() {return self.id},
-        listeners: [],
-        nicknames: {},
-        send: function(message) {
-            return self.sendRoom(roomName, message);
-        },
-        sendNickName: function(nickname) {
-            this.send({__nickname: nickname});
-        },
-        getRoomUsers: function() {
-            var self2 = this;
-            if (!self.rooms[roomName]) {
-              return [];
-            }
-            return self.rooms[roomName].map(function(userId) {
-                var nickname = self2.nicknames[userId];
-                return nickname ? nickname : userId;
-            });
-        },
-        addListener: function(fonction) {
-            var listener = self.addListener(function(messageObj) {
-                if (messageObj.room && messageObj.room === roomName) {
-                    fonction(messageObj);
-                }
-            });
-            this.listeners.push(listener);
-            return listener;
-        },
-        addRoomListener: function(fonction) {
-            var listener = self.addRoomListener(function(messageObj) {
-                if (messageObj.room === roomName) {
-                    fonction(messageObj);
-                }
-            });
-            this.listeners.push(listener);
-            return listener;
-        },
-        close: function() {
-            self.leaveRoom(roomName);
-            this.listeners.map(function(listener) {
-                listener.delete();
-            });
-        }
-    }
-    result.addListener(function(messageObj) {
-        if (messageObj.message.__nickname) {
-            result.nicknames[messageObj.source] = messageObj.message.__nickname;
-        }
-    });
-    return result;
+    return new RoomSocket(roomName, this);
 }
 module.exports = SocketBus;
