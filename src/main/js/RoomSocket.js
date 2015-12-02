@@ -47,5 +47,8 @@ RoomSocket.prototype.addListener = function(fonction) {
 RoomSocket.prototype.getId = function() {
     return this.rootSocket.id;
 }
+RoomSocket.prototype.subSocket = function(name) {
+    return new SubSocket(this, name);
+}
 
 module.exports = RoomSocket;
