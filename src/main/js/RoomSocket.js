@@ -44,6 +44,9 @@ RoomSocket.prototype.addListener = function(fonction) {
     this.listeners.push(listener);
     return listener;
 }
+RoomSocket.prototype.addRoomListener = function(fonction) {
+    return this.rootSocket.addRoomListener(fonction);
+}
 RoomSocket.prototype.getId = function() {
     return this.rootSocket.id;
 }
