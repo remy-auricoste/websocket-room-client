@@ -92,7 +92,7 @@ var SocketBus = function(host, onReceive) {
     });
     this.connectPromise = defer.promise;
     this.connectPromise.then(function() {
-        cron(40000, function() {
+        cron(10000, function() {
             self.sendCommand("PING");
             return self.connected;
         });
