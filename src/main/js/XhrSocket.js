@@ -1,5 +1,5 @@
 var Q = require("q");
-var Request = require("./Request");
+var Request = require("rauricoste-request");
 var IntervalCall = require("./IntervalCall");
 
 var Socket = function(receiver) {
@@ -8,11 +8,7 @@ var Socket = function(receiver) {
 Socket.prototype.connect = function(url) {
     var self = this;
     this.url = url;
-    return Request.call({
-        url: url,
-        method: "GET",
-        withCredentials: false
-    }).then(function(result) {
+    return new Request().get(url).then(function(result) {
         console.log("connected", result);
         var message = JSON.parse(result.body);
         if (message.id) {
@@ -30,7 +26,7 @@ Socket.prototype.connect = function(url) {
 }
 Socket.prototype.close = function() {
     self.connnected = false;
-    return Request.call({
+    return new Request().call({
         url: self.url+"/"+self.id,
         method: "DELETE",
         withCredentials: false
@@ -49,12 +45,7 @@ Socket.prototype.send = function(message) {
         throw new Error("not connected !");
     }
     var self = this;
-    return Request.call({
-        url: self.url+"/"+self.id,
-        method: "POST",
-        withCredentials: false,
-        postParams: message
-    }).then(function(result) {
+    return new Request().post(self.url+"/"+self.id, message+"").then(function(result) {
         var body = result.body;
         var response = JSON.parse(body);
         if (response.error) {
@@ -66,11 +57,7 @@ Socket.prototype.send = function(message) {
 }
 Socket.prototype.poll = function() {
     var self = this;
-    return Request.call({
-        url: self.url+"/"+self.id,
-        method: "GET",
-        withCredentials: false
-    }).then(function(result) {
+    return new Request().get(self.url+"/"+self.id).then(function(result) {
         var body = result.body;
         var message = JSON.parse(body);
         if (message.newId) {

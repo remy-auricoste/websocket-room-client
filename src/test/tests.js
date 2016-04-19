@@ -1,1 +1,0 @@
-require("rauricoste-node-tests");

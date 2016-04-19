@@ -4,7 +4,6 @@
   "description": "",
   "main": "src/main/js/SocketBus.js",
   "scripts": {
-    "test": "node commands.js test",
     "start": "node server.js"
   },
   "author": "remy.auricoste@gmail.com",
@@ -15,7 +14,8 @@
     "rauricoste-websocket-room-server": "0.0.x"
   },
   "dependencies": {
-    "q": "^1.4.1",
-    "rauricoste-random": "0.0.1"
+    "rauricoste-promise-light": "0.0.6",
+    "rauricoste-random": "0.0.1",
+    "rauricoste-request": "0.0.x"
   }
 }
