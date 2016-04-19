@@ -5,10 +5,14 @@ var IntervalCall = require("./IntervalCall");
 var Socket = function(receiver) {
     this.receiver = receiver;
 }
+var createRequest = function() {
+    return new Request().withCredentials(false);
+}
+
 Socket.prototype.connect = function(url) {
     var self = this;
     this.url = url;
-    return new Request().get(url).then(function(result) {
+    return createRequest().get(url).then(function(result) {
         console.log("connected", result);
         var message = JSON.parse(result.body);
         if (message.id) {
@@ -26,7 +30,7 @@ Socket.prototype.connect = function(url) {
 }
 Socket.prototype.close = function() {
     self.connnected = false;
-    return new Request().call({
+    return createRequest().call({
         url: self.url+"/"+self.id,
         method: "DELETE",
         withCredentials: false
@@ -45,7 +49,7 @@ Socket.prototype.send = function(message) {
         throw new Error("not connected !");
     }
     var self = this;
-    return new Request().post(self.url+"/"+self.id, message+"").then(function(result) {
+    return createRequest().post(self.url+"/"+self.id, message+"").then(function(result) {
         var body = result.body;
         var response = JSON.parse(body);
         if (response.error) {
@@ -57,7 +61,7 @@ Socket.prototype.send = function(message) {
 }
 Socket.prototype.poll = function() {
     var self = this;
-    return new Request().get(self.url+"/"+self.id).then(function(result) {
+    return createRequest().get(self.url+"/"+self.id).then(function(result) {
         var body = result.body;
         var message = JSON.parse(body);
         if (message.newId) {
