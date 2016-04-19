@@ -1,4 +1,4 @@
-var Q = require("q");
+var Q = require("./Q");
 var Request = require("rauricoste-request");
 var IntervalCall = require("./IntervalCall");
 

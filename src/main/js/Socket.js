@@ -1,4 +1,4 @@
-var Q = require("q");
+var Q = require("./Q");
 
 var Socket = function(receiver) {
     this.receiver = receiver;
