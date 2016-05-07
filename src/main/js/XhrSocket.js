@@ -1,6 +1,7 @@
 var Q = require("./Q");
 var Request = require("rauricoste-request");
 var IntervalCall = require("./IntervalCall");
+var logger = require("./Logger").getLogger("XhrSocket");
 
 var Socket = function(receiver) {
     this.receiver = receiver;
@@ -13,7 +14,7 @@ Socket.prototype.connect = function(url) {
     var self = this;
     this.url = url;
     return createRequest().get(url).then(function(result) {
-        console.log("connected", result);
+        logger.info("connected", result);
         var message = JSON.parse(result.body);
         if (message.id) {
             self.connected = true;
@@ -65,7 +66,7 @@ Socket.prototype.poll = function() {
         var body = result.body;
         var message = JSON.parse(body);
         if (message.newId) {
-          console.log("newId", self.id, message.newId);
+          logger.info("newId", self.id, message.newId);
           self.id = message.newId;
           return;
         }

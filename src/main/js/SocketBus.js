@@ -4,6 +4,7 @@
 /* import XhrSocket */ var XhrSocket = require('./XhrSocket');
 var Q = require("./Q");
 var Random = require("rauricoste-random");
+var logger = require("./Logger").getLogger("SocketBus");
 
 var cron = function(interval, fonction) {
     setTimeout(function() {
@@ -40,14 +41,14 @@ var SocketBus = function(host, onReceive) {
             switch(message.server) {
                 case "ID":
                     self.id = message.id;
-                    console.log("SocketBus connected to "+self.usedHost+" with id "+self.id);
+                    logger.info("SocketBus connected to "+self.usedHost+" with id "+self.id);
                     defer.resolve();
                     break;
                 case "ERROR":
                     console.error(message.originalMessage, message.error);
                     break;
                 case "JOIN":
-                    console.log("joined room "+message.room, message.members);
+                    logger.info("joined room "+message.room, message.members);
                     self.rooms[message.room] = message.members;
                     self.callRoomUpdate(message.room);
                     break;
@@ -189,4 +190,6 @@ SocketBus.prototype.openRoom = function(roomName) {
 SocketBus.prototype.getId = function() {
     return this.id;
 }
+
+SocketBus.logger = require("./Logger");
 module.exports = SocketBus;

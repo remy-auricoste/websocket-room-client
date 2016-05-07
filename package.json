@@ -14,6 +14,7 @@
     "rauricoste-websocket-room-server": "0.0.x"
   },
   "dependencies": {
+    "loglevel": "^1.4.0",
     "rauricoste-promise-light": "0.0.6",
     "rauricoste-random": "0.0.1",
     "rauricoste-request": "0.0.x"
