@@ -11,4 +11,4 @@ var fileServer = new static.Server('.', {
 //    }).resume();
 //}).listen(8000);
 
-new Server.XhrServer(8001);
+//new Server.XhrServer(8001);
