@@ -1,7 +1,7 @@
 var Q = require("./Q");
 var Request = require("rauricoste-request");
 var logger = require("./Logger").getLogger("XhrSocket");
-var Socket = require("./RealSocket");
+var Socket = require("./Socket");
 
 var XhrSocket = function(receiver) {
     this.receiver = receiver;

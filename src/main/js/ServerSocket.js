@@ -5,7 +5,7 @@ var Q = require("./Q");
 var Random = require("rauricoste-random");
 var logger = require("./Logger").getLogger("SocketBus");
 var EventStream = require("rauricoste-event-stream");
-var Socket = require("./RealSocket");
+var Socket = require("./Socket");
 
 var ServerSocket = function(id, messageSocket, roomUpdateStream) {
     this.id = id;

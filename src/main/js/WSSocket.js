@@ -1,5 +1,5 @@
 var Q = require("./Q");
-var Socket = require("./RealSocket");
+var Socket = require("./Socket");
 var logger = require("./Logger");
 
 var WSSocket = function(url) {
