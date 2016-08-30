@@ -1,16 +1,16 @@
 var Q = require("./Q");
 var Request = require("rauricoste-request");
-var IntervalCall = require("./IntervalCall");
 var logger = require("./Logger").getLogger("XhrSocket");
+var Socket = require("./RealSocket");
 
-var Socket = function(receiver) {
+var XhrSocket = function(receiver) {
     this.receiver = receiver;
 }
 var createRequest = function() {
     return new Request().withCredentials(false);
 }
 
-Socket.prototype.connect = function(url) {
+XhrSocket.prototype.connect = function(url) {
     var self = this;
     this.url = url;
     return createRequest().get(url).then(function(result) {
@@ -19,9 +19,9 @@ Socket.prototype.connect = function(url) {
         if (message.id) {
             self.connected = true;
             self.id = message.id;
-            IntervalCall(1000, function() {
+            setInterval(function() {
                 self.poll();
-            });
+            }, 1000);
         } else if (message.error) {
             throw new Error(message.error);
         }
@@ -29,7 +29,7 @@ Socket.prototype.connect = function(url) {
         throw err;
     });
 }
-Socket.prototype.close = function() {
+XhrSocket.prototype.close = function() {
     self.connnected = false;
     return createRequest().call({
         url: self.url+"/"+self.id,
@@ -45,7 +45,7 @@ Socket.prototype.close = function() {
         console.error("error", err);
     });
 }
-Socket.prototype.send = function(message) {
+XhrSocket.prototype.send = function(message) {
     if (!this.connected) {
         throw new Error("not connected !");
     }
@@ -60,7 +60,7 @@ Socket.prototype.send = function(message) {
         console.error("error", err);
     });
 }
-Socket.prototype.poll = function() {
+XhrSocket.prototype.poll = function() {
     var self = this;
     return createRequest().get(self.url+"/"+self.id).then(function(result) {
         var body = result.body;
@@ -82,4 +82,15 @@ Socket.prototype.poll = function() {
         console.error("error", err);
     });
 }
-module.exports = Socket;
+module.exports = function(url) {
+    var socket = new Socket();
+    var xhrSocket = new XhrSocket(function(message) {
+        socket.inStream.publish(message);
+    })
+    socket.outStream.subscribe(function(message) {
+        return xhrSocket.send(message);
+    })
+    return xhrSocket.connect(url).then(function() {
+        return socket;
+    })
+};

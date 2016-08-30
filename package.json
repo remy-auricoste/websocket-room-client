@@ -4,19 +4,22 @@
   "description": "",
   "main": "src/main/js/SocketBus.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js & node start.js",
+    "test": "./node_modules/mocha/bin/mocha --require './src/tests' 'src/**/*.spec.js'"
   },
   "author": "remy.auricoste@gmail.com",
   "license": "ISC",
   "devDependencies": {
-    "node-static": "^0.7.6",
-    "rauricoste-node-tests": "x",
+    "chai": "^3.5.0",
+    "mocha": "^3.0.2",
+    "rauricoste-web-builder": "0.0.x",
     "rauricoste-websocket-room-server": "0.0.x"
   },
   "dependencies": {
+    "rauricoste-event-stream": "0.0.x",
     "rauricoste-logger": "0.0.x",
-    "rauricoste-promise-light": "0.0.6",
-    "rauricoste-random": "0.0.1",
+    "rauricoste-promise-light": "0.0.x",
+    "rauricoste-random": "0.0.x",
     "rauricoste-request": "0.0.x"
   }
 }
