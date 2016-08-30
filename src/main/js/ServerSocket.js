@@ -13,7 +13,16 @@ var ServerSocket = function(id, messageSocket, roomUpdateStream) {
     this.roomUpdateStream = roomUpdateStream;
 }
 ServerSocket.prototype.openP2PSocket = function(dest) {
-    var socket = new Socket();
+    var self = this;
+    var socket = new Socket(this.messageSocket.inStream.filter(function(message) {
+        return message.dest && message.dest === self.id;
+    }));
+    socket.outStream.subscribe(function(message) {
+        self.messageSocket.send({
+            dest: dest,
+            message: message
+        });
+    });
     return socket;
 }
 ServerSocket.prototype.openRoomSocket = function(roomName) {
@@ -56,7 +65,7 @@ var ServerSocketFactory = function(host) {
         var roomUpdateStream = new EventStream();
         var receiveFct = function(messageStr) {
             var message = JSON.parse(messageStr);
-            console.log("raw message", message);
+            logger.debug("raw message", message);
             if (message.server) {
                 switch(message.server) {
                     case "ID":
@@ -65,7 +74,7 @@ var ServerSocketFactory = function(host) {
                         defer.resolve(new ServerSocket(message.id, messageSocket, roomUpdateStream));
                         break;
                     case "ERROR":
-                        console.error(message.originalMessage, message.error);
+                        logger.error(message.originalMessage, message.error);
                         break;
                     case "JOIN":
                         logger.info("joined room "+message.room, message.members);
@@ -74,7 +83,7 @@ var ServerSocketFactory = function(host) {
                         roomUpdateStream.publish(message);
                         break;
                     default:
-                        console.warn("unknown command", message.server);
+                        logger.warn("unknown command", message.server);
                 }
                 return;
             }

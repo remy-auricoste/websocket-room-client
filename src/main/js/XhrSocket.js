@@ -42,7 +42,7 @@ XhrSocket.prototype.close = function() {
             throw new Error(response.error);
         }
     }).catch(function(err) {
-        console.error("error", err);
+        logger.error("error", err);
     });
 }
 XhrSocket.prototype.send = function(message) {
@@ -57,7 +57,7 @@ XhrSocket.prototype.send = function(message) {
             throw new Error(response.error);
         }
     }).catch(function(err) {
-        console.error("error", err);
+        logger.error("error", err);
     });
 }
 XhrSocket.prototype.poll = function() {
@@ -79,7 +79,7 @@ XhrSocket.prototype.poll = function() {
             self.receiver(str);
         }
     }).catch(function(err) {
-        console.error("error", err);
+        logger.error("error", err);
     });
 }
 module.exports = function(url) {

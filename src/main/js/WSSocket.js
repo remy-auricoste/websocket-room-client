@@ -1,5 +1,6 @@
 var Q = require("./Q");
 var Socket = require("./RealSocket");
+var logger = require("./Logger");
 
 var WSSocket = function(url) {
     var socket = new Socket();
@@ -18,7 +19,7 @@ var WSSocket = function(url) {
             if (!connected) {
                 defer.reject(err);
             } else {
-                console.error(err);
+                logger.error(err);
             }
         }
         webSocket.onmessage = function(event) {

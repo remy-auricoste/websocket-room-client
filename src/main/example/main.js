@@ -1,6 +1,7 @@
 var ServerSocket = require("../js/ServerSocket");
 
 new ServerSocket("http://localhost:8001/socket").then(function(serverSocket) {
+    console.log("id", serverSocket.id);
     serverSocket.messageSocket.subscribe(function(message) {
         console.log("receive", message);
     });
@@ -9,11 +10,11 @@ new ServerSocket("http://localhost:8001/socket").then(function(serverSocket) {
     });
 
     var roomSocket = serverSocket.openRoomSocket("testRoom");
-    console.log("room subscribe");
     roomSocket.subscribe(function(message) {
         console.log("room message", message);
     });
-    roomSocket.send("hello "+new Date().getTime());
+    roomSocket.send("hello I am "+serverSocket.id);
+    serverSocket.openP2PSocket(serverSocket.id).send("plop");
 }).catch(function(err) {
     console.error(err);
 })

@@ -20,3 +20,7 @@ var config = {
     },
 }
 require("rauricoste-web-builder").watch(config);
+
+var Server = require("rauricoste-websocket-room-server");
+
+new Server.XhrServer(8001);

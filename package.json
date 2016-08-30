@@ -4,7 +4,7 @@
   "description": "",
   "main": "src/main/js/SocketBus.js",
   "scripts": {
-    "start": "node server.js & node start.js",
+    "start": "node start.js",
     "test": "./node_modules/mocha/bin/mocha --require './src/tests' 'src/**/*.spec.js'"
   },
   "author": "remy.auricoste@gmail.com",
